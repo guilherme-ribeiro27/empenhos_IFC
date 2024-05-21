@@ -13,7 +13,6 @@ def run():
         "Natureza Despesa",
         "Natureza Despesa Detalhada",
         "Métrica",
-        "Mês",
         "Empenhado",
         "Liquidado",
     ]
@@ -29,31 +28,28 @@ def run():
     # Aqui começa o código do nested_pie.py
     st.write("Dataframe Janeiro")
     df_mes = (
-        df.groupby(["Mês", "Natureza Despesa"])[["Empenhado", "Liquidado"]]
+        df.groupby(["Natureza Despesa"])[["Empenhado", "Liquidado"]]
         .sum()
         .reset_index()
     )
     df_mes["Pendente"] = df_mes["Empenhado"] - df_mes["Liquidado"]
 
-    # st.write(df_mes)
 
-    x1 = df_mes[df_mes["Mês"] == "01/2024"]
-    st.write(x1)
-    # x2 = df_mes[df_mes["Mês"] == "01/2024"]
+    # x1 = df_mes[df_mes["Mês"] == "01/2024"]
+    x1 = df_mes.copy()
+    x1 = x1.sort_values(by="Natureza Despesa")
 
-    # st.write(x1)
-    # st.write(x2)
 
     fig, ax = plt.subplots()
 
     size = 0.3
     vals = x1.sort_values(by="Natureza Despesa")["Empenhado"]
-    # st.write(vals)
 
-    # cmap = plt.colormaps["tab20c"]
-    # outer_colors = cmap(np.arange(3) * 4)
-    # inner_colors = cmap([1, 2, 5, 6, 9, 10])
+    st.write(x1)
+
     outer_colors = [
+        "blue",
+        "darkblue",
         "blue",
         "darkblue",
         "blue",
@@ -62,6 +58,10 @@ def run():
         "darkblue",
     ]  # Cores para as fatias externas
     inner_colors = [
+        "grey",
+        "darkgrey",
+        "grey",
+        "darkgrey",
         "grey",
         "darkgrey",
         "grey",
@@ -95,18 +95,20 @@ def run():
     )
     tipo_mapping = {"Liquidado": "L", "Pendente": "P"}
     df_melted["Tipo"] = df_melted["Tipo"].map(tipo_mapping)
-    tipo_mapping = {"DIARIAS - PESSOAL CIVIL": "DPC",
+    tipo_mapping = {"AUXILIO FINANCEIRO A ESTUDANTES": "AFE",
+                    "DIARIAS - PESSOAL CIVIL": "DPC",
                     "LOCACAO DE MAO-DE-OBRA": "LMO",
+                    "MATERIAL DE CONSUMO": "MC",
                     "OBRIGACOES TRIBUTARIAS E CONTRIBUTIVAS": "OTC",
-                    "OUTROS SERVICOS DE TERCEIROS - PESSOA JURIDICA": "OSTPJ",
                     "OUTROS SERVICOS DE TERCEIROS - PESSOA FISICA": "OSTPF",
+                    "OUTROS SERVICOS DE TERCEIROS - PESSOA JURIDICA": "OSTPJ",
                     "SERVICOS DE TECNOLOGIA DA INFORMACAO E COMUNICACAO - PJ": "STIC",
                 }
     df_melted["Natureza Despesa"] = df_melted["Natureza Despesa"].map(tipo_mapping)
-    # st.write(df_melted.sort_values(by="Natureza Despesa"))
-
+    df_melted = df_melted.sort_values(["Natureza Despesa", "Tipo"])
+    st.write(df_melted)
     ax.pie(
-        df_melted.sort_values("Natureza Despesa")["Valor"],
+        df_melted.sort_values(["Natureza Despesa", "Tipo"])["Valor"],
         labels=df_melted.sort_values("Natureza Despesa")["Natureza Despesa"],
         radius=1 - size,
         colors=inner_colors,
