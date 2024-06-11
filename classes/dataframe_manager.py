@@ -206,18 +206,24 @@ class DataframeManager:
         self.to_float()
         visible_columns = [
             'Natureza Despesa',
+            'Natureza Despesa Detalhada',
             'Empenhado',
             'Liquidado',
         ]
 
         df = st.session_state.df_master[visible_columns]
-        df_by_nature = df[df['Natureza Despesa'].isin(nature)]
-        df_by_nature = df_by_nature.groupby(['Natureza Despesa'])[['Empenhado', 'Liquidado']].sum().reset_index()
+        df_by_nature = df[df['Natureza Despesa'] == (nature)]
+        visible_columns = [
+            'Natureza Despesa Detalhada',
+            'Empenhado',
+            'Liquidado',
+        ]
+        df_by_nature = df_by_nature.groupby(['Natureza Despesa Detalhada'])[['Empenhado', 'Liquidado']].sum().reset_index()
 
         option = {
             "yAxis": {
                 "type": 'category',
-                "data": df_by_nature['Natureza Despesa'].tolist()
+                "data": df_by_nature['Natureza Despesa Detalhada'].tolist()
             },
             "series": [
                 {
